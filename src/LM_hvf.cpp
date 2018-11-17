@@ -4,8 +4,8 @@
 using namespace std;
 
 int main(int argc, char const *argv[]){
-    const int n = 4;
-    const int m = 11;
+    const int n = 3;
+    const int m = 3;
 
     var params[n];
     params[0] = -1;

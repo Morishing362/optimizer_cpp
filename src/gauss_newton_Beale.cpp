@@ -4,14 +4,12 @@
 using namespace std;
 
 int main(int argc, char const *argv[]){
-    const int n = 4;
-    const int m = 11;
+    const int n = 2;
+    const int m = 3;
 
     var params[n];
-    params[0] = 0.25;
-    params[1] = 0.39;
-    params[2] = 0.415;
-    params[3] = 0.39;
+    params[0] = 1;
+    params[1] = 1;
 
 // varをeigenに移す
     VectorXd dx(n);
@@ -24,21 +22,28 @@ int main(int argc, char const *argv[]){
 
     LeastSquaresFunc LS;
     var E;
+    var funcvec[m];
+    VectorXd e(m);
     VectorXd g(n);
-    MatrixXd H;
-    double dxnorm, answer;
-
-    answer = 1.53753e-4;
+    MatrixXd J, Jt, JtJ;
+    double dxnorm;
 
     for(int k=0; k<100; k++){
 
-        E = LS.Kowalik_and_Osborne_function(params);
-        cout << sqrt(((val(E) - answer)*(val(E) - answer))) << endl;
+        E = LS.Beale_function(params);
+        LS.Beale_function_vectorizer(funcvec, params);
+        cout << E << endl;
 
-        g = Gradient_Xd(n, E, params);
-        H = Hesse_Xd(n, E, params);
+        for (int i=0; i<m; i++){
+            e(i) = val(funcvec[i]);
+        }
+
+        J = Jacobi_Xd(m, n, funcvec, params);
+        Jt = J.transpose();
+        JtJ = Jt * J;
+        g = Jt * e;
         
-        dx = H.fullPivLu().solve(-g);
+        dx = JtJ.fullPivLu().solve(-g);
         x = x + dx;
     
         //params更新
@@ -57,7 +62,7 @@ int main(int argc, char const *argv[]){
             break;
         }
     }
-    cout << "\nH = \n" << H << endl;
+    cout << "\nJtJ = \n" << JtJ << endl;
     cout << "\nx = \n" << x <<endl;  
     cout << "\n||dx|| = \n" << dxnorm <<endl;
 

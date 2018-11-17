@@ -28,12 +28,14 @@ int main(int argc, char const *argv[]){
     VectorXd e(m);
     VectorXd g(n);
     MatrixXd J, Jt, JtJ;
-    double dxnorm;
+    double dxnorm, answer;
+
+    answer = 1.53753e-4;
 
     for(int k=0; k<100; k++){
         E = LS.Kowalik_and_Osborne_function(params);
         LS.Kowalik_and_Osborne_function_vectorizer(funcvec, params);
-        cout << E << endl;
+        cout << sqrt(((val(E) - answer)*(val(E) - answer))) << endl;
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);

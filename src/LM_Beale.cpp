@@ -4,14 +4,12 @@
 using namespace std;
 
 int main(int argc, char const *argv[]){
-    const int n = 4;
-    const int m = 11;
+    const int n = 2;
+    const int m = 3;
 
     var params[n];
-    params[0] = 0.25;
-    params[1] = 0.39;
-    params[2] = 0.415;
-    params[3] = 0.39;
+    params[0] = 1;
+    params[1] = 1;
 
     // varをeigenに移す
     VectorXd dx(n);
@@ -29,19 +27,18 @@ int main(int argc, char const *argv[]){
     VectorXd e(m);
     VectorXd g(n);
     MatrixXd J, Jt, JtJ, L, I;
-    double dxnorm, damp, F, answer;
+    double dxnorm, damp, F;
 
-    damp = 1;
+    damp = 0.01;
     I = MatrixXd::Identity(n, n);
-    F = val(LS.Kowalik_and_Osborne_function(params));
-    answer = 1.53753e-4;
+    F = val(LS.Beale_function(params));
 
     cout << "\ndamp_init = \n" << damp << "\n" << endl;
 
     for(int k=0; k<100; k++){
-        E = LS.Kowalik_and_Osborne_function(params);
-        LS.Kowalik_and_Osborne_function_vectorizer(funcvec, params);
-        cout << sqrt(((val(E) - answer)*(val(E) - answer))) << endl;
+        E = LS.Beale_function(params);
+        LS.Beale_function_vectorizer(funcvec, params);
+        cout << val(E) << endl;
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);
@@ -60,10 +57,10 @@ int main(int argc, char const *argv[]){
         for(int j=0; j<n; j++){
             params[j] = x_dash(j);
         }
-        E_plus_1 = LS.Kowalik_and_Osborne_function(params);
+        E_plus_1 = LS.Beale_function(params);
 
         // ダンピングファクタ変更判定
-        if( val(E_plus_1) > F ){
+        if( val(E_plus_1) >= F ){
             damp = 10 * damp;
             for(int j=0; j<n; j++){
                 params[j] = x(j); // params戻す
