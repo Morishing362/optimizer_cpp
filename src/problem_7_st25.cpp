@@ -4,14 +4,12 @@
 using namespace std;
 
 int main(int argc, char const *argv[]){
-    const int n = 4;
-    const int m = 45;
+    const int n = 2;
+    const int m = 2;
 
     var params[n];
-    params[0] = 1;
-    params[1] = 2;
-    params[2] = 1;
-    params[3] = -1;
+    params[0] = 0.5;
+    params[1] = -2;
 
     // varをeigenに移す
     VectorXd dx(n);
@@ -22,35 +20,37 @@ int main(int argc, char const *argv[]){
     }
 
     LeastSquaresFunc LS;
-    Strategy_1 ST;
+    Strategy_2 ST;
     var params_dash[n];
     var E, E_dash;
     var funcvec[m];
     VectorXd e(m);
     VectorXd g(n);
     MatrixXd J, Jt, JtJ, L, I;
-    double tau, damp, gf, answer, F;
+    double tau, damp, nu, beta, gamma, p, gf, answer, F;
 
     I = MatrixXd::Identity(n, n);
 
-    tau = 1.0e-3;
-    LS.Exponential_fit_2_vectorizer(funcvec, params);
+    tau = 1.0;
+    LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
     J = Jacobi_Xd(m, n, funcvec, params);
     Jt = J.transpose();
     JtJ = Jt * J;
     damp = tau * Max_diagonal(JtJ);
-    answer = 0.005;
-    F = val(LS.Exponential_fit_2(params));
+    answer = 24.4921;
+    nu = 2.0;
+    beta = 2.0;
+    gamma = 3.0;
+    p = 3.0;
 
+    cout << "\nJtJ = \n" << JtJ << "\n" << endl;
     cout << "\nx_init = \n" << x << "\n" << endl;
     cout << "\ndamp_init = \n" << damp << "\n" << endl;
 
-    cout << "\n" << "E          ||g||          damp       E_dash - E         gf" <<endl;
+    // cout << "\n" << "E          ||g||          damp       E_dash - E         gf" <<endl;
     for(int k=0; k<70; k++){
-        // cout << damp <<endl;
-        E = LS.Exponential_fit_2(params);
-        LS.Exponential_fit_2_vectorizer(funcvec, params);
-        // cout << val(E) << endl;
+        E = LS.Freudenstein_and_Roth_function(params);
+        LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);
@@ -62,34 +62,40 @@ int main(int argc, char const *argv[]){
         g = Jt * e;
         L = JtJ + I*damp;
         dx = L.fullPivLu().solve(-g);
-        // cout << g.norm() << endl;
+        // 収束判定
+        if ( g.norm() < 1.0e-12 ){
+            break;
+        }
+        if( dx.norm()/x.norm() < 1.0e-12 ){
+            break;
+        }
     
         x_dash = x + dx;
         for(int j=0; j<n; j++){
             params[j] = x_dash(j);
         }
-        E_dash = LS.Exponential_fit_2(params);
+        E_dash = LS.Freudenstein_and_Roth_function(params);
         for(int j=0; j<n; j++){
             params[j] = x(j);
         }
 
         //gain_factor
         gf = Gain_Factor(E, E_dash, damp, g, dx);
-
-        cout << val(E) << "  " << g.norm() << "  " << damp << "  " << val(E_dash) - val(E) << "  " << gf << endl;
-        // ダンピングファクタ変更判定
-        // ST.Damper(gf, damp);
-        if( gf < 0.2 ){
-            damp = damp * 2.0;
-        }
-        else if( 0.8 < gf ){
-            damp = damp / 3.0;
-        }
-        // xとparams更新か否か
         ST.Change_x_params(gf, params, x, dx);
-        // 収束判定
-        if ( g.norm() < ST.ep1 ){
-            break;
+        // cout << damp <<endl;
+        cout << g.norm() <<endl;
+        // cout << val(E) << endl;
+        // cout << gf <<endl;
+        // cout << val(E) << "  " << g.norm() << "  " << damp << "  " << val(E_dash) - val(E) << "  " << gf << endl;
+
+        // ダンピングファクタ変更判定
+        if (gf > 0){
+            damp = damp * ST.max_in_2(beta, gamma, p, gf);
+            nu = beta;
+        }
+        else {
+            damp = damp * nu;
+            nu = 2.0 * nu;
         }
     }
 

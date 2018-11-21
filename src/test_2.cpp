@@ -44,10 +44,8 @@ int main(int argc, char const *argv[]){
 
     // cout << "\n" << "E          ||g||          damp       E_dash - E         gf" <<endl;
     for(int k=0; k<70; k++){
-        // cout << damp <<endl;
         E = LS.Freudenstein_and_Roth_function(params);
         LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
-        // cout << val(E) << endl;
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);
@@ -59,7 +57,10 @@ int main(int argc, char const *argv[]){
         g = Jt * e;
         L = JtJ + I*damp;
         dx = L.fullPivLu().solve(-g);
-        // cout << g.norm() << endl;
+        // 収束判定
+        if ( g.norm() < 1.0e-12 ){
+            break;
+        }
         if( dx.norm()/x.norm() < 1.0e-12 ){
             break;
         }
@@ -75,9 +76,13 @@ int main(int argc, char const *argv[]){
 
         //gain_factor
         gf = Gain_Factor(E, E_dash, damp, g, dx);
-        cout << gf <<endl;
-
+        ST.Change_x_params(gf, params, x, dx);
+        // cout << damp <<endl;
+        cout << g.norm() <<endl;
+        // cout << val(E) << endl;
+        // cout << gf <<endl;
         // cout << val(E) << "  " << g.norm() << "  " << damp << "  " << val(E_dash) - val(E) << "  " << gf << endl;
+
         // ダンピングファクタ変更判定
         if( gf < 0.2 ){
             damp = damp * 2.0;
@@ -86,11 +91,6 @@ int main(int argc, char const *argv[]){
             damp = damp / 3.0;
         }
         // xとparams更新か否か
-        ST.Change_x_params(gf, params, x, dx);
-        // 収束判定
-        if ( g.norm() < 1.0e-12 ){
-            break;
-        }
     }
 
     cout << "\nJtJ = \n" << JtJ << endl;

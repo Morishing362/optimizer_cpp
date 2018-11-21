@@ -34,12 +34,19 @@ class Strategy_1{
     void Change_x_params(double gf, var params[], VectorXd& x, VectorXd& dx);
 };
 
+class Strategy_2{
+  public:
+    double max_in_2(double beta, double gamma, double p, double gf);
+    void Change_x_params(double gf, var params[], VectorXd& x, VectorXd& dx);
+};
+
 VectorXd Gradient_Xd(const int n, var costfunc, const var params[]);
 MatrixXd Hesse_Xd(const int n, var costfunc, const var params[]);
 MatrixXd Jacobi_Xd(const int m, const int n, var costfuncXd[], const var params[]);
 
 double Max_diagonal(MatrixXd& X);
 double Gain_Factor(var E, var E_dash, VectorXd g, VectorXd dx);
+double max_in_2(double beta, double gamma, double p, double gf);
 
 
 // 以下詳細
@@ -154,7 +161,7 @@ var LeastSquaresFunc::Exponential_fit_2(const var params[4]){
   y[40]  = 0.075261;  y[41]  = 0.068387;  y[42]  = 0.090823;  y[43]  = 0.085205;
   y[44]  = 0.067203;
   for (int i=0; i<45; i++){
-    er[i] =  y[i] - ( params[2] * exp(params[0]*t*(i+1)) + params[3] * exp(params[1]*t*(i+1)) );
+    er[i] =  y[i] - ( params[2] * exp(-params[0]*t*(i+1)) + params[3] * exp(-params[1]*t*(i+1)) );
     E += ( er[i]*er[i] )/2;
   }
   return E;
@@ -175,7 +182,7 @@ void LeastSquaresFunc::Exponential_fit_2_vectorizer(var funcvec[45], const var p
   y[40]  = 0.075261;  y[41]  = 0.068387;  y[42]  = 0.090823;  y[43]  = 0.085205;
   y[44]  = 0.085205;
   for (int i=0; i<45; i++){
-    funcvec[i] = y[i] - ( params[2] * exp(params[0]*t*(i+1)) + params[3] * exp(params[1]*t*(i+1)) );
+    funcvec[i] = y[i] - ( params[2] * exp(-params[0]*t*(i+1)) + params[3] * exp(-params[1]*t*(i+1)) );
   }
 };
 
@@ -187,8 +194,8 @@ double LeastSquaresFunc::Error(var E, double answer){
 Strategy_1::Strategy_1(){
   ep1 = 1.0e-10;
   ep2 = 1.0e-10;
-  q1 = 0.25;
-  q2 = 0.75;
+  q1 = 0.2;
+  q2 = 0.8;
   Alpha = 1.0;
   Beta = 2.0;
   Gamma = 3.0;
@@ -196,10 +203,10 @@ Strategy_1::Strategy_1(){
  
 void Strategy_1::Damper(double gf, double damp){
   if( gf < q1 ){
-    damp = damp * Beta;
+    damp = damp * 2.0;
   }
   else if( q2 < gf ){
-    damp = damp / Gamma;
+    damp = damp / 3.0;
   }
 };
 
@@ -212,6 +219,26 @@ void Strategy_1::Change_x_params(double gf, var params[], VectorXd& x, VectorXd&
     params[i] = x(i);
   }
 }
+
+double Strategy_2::max_in_2(double beta, double gamma, double p, double gf){
+  double a = 1 / gamma;
+  double b = 1 - (beta-1) * pow(2*gf-1, p);
+  if (a > b)
+    return a;
+    
+  else return b;
+};
+
+void Strategy_2::Change_x_params(double gf, var params[], VectorXd& x, VectorXd& dx){
+  int n = x.size();
+  if ( 0 < gf ){
+    x = x + dx;
+  }
+  for (int i=0; i<n; i++){
+    params[i] = x(i);
+  }
+}
+
 
 //最小二乗のコスト関数のグラディエント，ヘッセ行列，ヤコビ行列の計算メソッド
 VectorXd Gradient_Xd(const int n, var costfunc, const var params[]){
