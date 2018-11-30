@@ -1,4 +1,17 @@
-OBJS = $(OUT_DIR)/newton_hvf $(OUT_DIR)/gauss_newton_hvf $(OUT_DIR)/LM_hvf $(OUT_DIR)/newton_KandO $(OUT_DIR)/gauss_newton_KandO $(OUT_DIR)/LM_KandO $(OUT_DIR)/saikyu_KandO $(OUT_DIR)/newton_Beale $(OUT_DIR)/gauss_newton_Beale $(OUT_DIR)/LM_Beale $(OUT_DIR)/test $(OUT_DIR)/test_2 $(OUT_DIR)/problem_7_st24 $(OUT_DIR)/problem_7_st25
+OBJS = $(OUT_DIR)/newton_hvf \
+       $(OUT_DIR)/gauss_newton_hvf \
+	   $(OUT_DIR)/LM_hvf \
+	   $(OUT_DIR)/newton_KandO \
+	   $(OUT_DIR)/gauss_newton_KandO \
+	   $(OUT_DIR)/LM_KandO \
+	   $(OUT_DIR)/saikyu_KandO \
+	   $(OUT_DIR)/newton_Beale \
+	   $(OUT_DIR)/gauss_newton_Beale \
+	   $(OUT_DIR)/LM_Beale \
+	   $(OUT_DIR)/test \
+	   $(OUT_DIR)/test_2 \
+	   $(OUT_DIR)/problem_7_st24 \
+	   $(OUT_DIR)/problem_7_st25
 CC = g++
 OUT_DIR = out
 SRC_DIR = src
