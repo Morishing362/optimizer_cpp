@@ -78,10 +78,11 @@ int main(int argc, char const *argv[]){
         gf = Gain_Factor(E, E_dash, damp, g, dx);
         ST.Change_x_params(gf, params, x, dx);
         // cout << damp <<endl;
-        cout << g.norm() <<endl;
-        // cout << val(E) << endl;
+        // cout << g.norm() <<endl;
+        // cout << abs(answer - val(E)) << endl;
         // cout << gf <<endl;
         // cout << val(E) << "  " << g.norm() << "  " << damp << "  " << val(E_dash) - val(E) << "  " << gf << endl;
+        cout << "[" << x(0) << ", " << x(1) << "]," <<endl;
 
         // ダンピングファクタ変更判定
         if( gf < 0.2 ){

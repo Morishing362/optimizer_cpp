@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/morisita611/.pyenv/versions/3.6.6/bin/python",
+    "python.pythonPath": "/home/morisita611/.pyenv/versions/anaconda3-5.2.0/bin/python",
     "files.associations": {
         "iostream": "cpp",
         "cmath": "cpp",

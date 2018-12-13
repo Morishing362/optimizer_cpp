@@ -10,8 +10,13 @@ OBJS = $(OUT_DIR)/newton_hvf \
 	   $(OUT_DIR)/LM_Beale \
 	   $(OUT_DIR)/test \
 	   $(OUT_DIR)/test_2 \
+	   $(OUT_DIR)/Beale_st24 \
+	   $(OUT_DIR)/Beale_st25 \
 	   $(OUT_DIR)/problem_7_st24 \
-	   $(OUT_DIR)/problem_7_st25
+	   $(OUT_DIR)/problem_7_st25 \
+	   $(OUT_DIR)/LM_problem_7 \
+	   $(OUT_DIR)/newton_problem_7 \
+	   $(OUT_DIR)/gauss_newton_problem_7
 CC = g++
 OUT_DIR = out
 SRC_DIR = src
@@ -40,8 +45,17 @@ gauss_newton_Beale : $(SRC_DIR)/gauss_newton_Beale.cpp
 	$(CC) -o $(OUT_DIR)/gauss_newton_Beale $(SRC_DIR)/gauss_newton_Beale.cpp
 LM_Beale : $(SRC_DIR)/LM_Beale.cpp
 	$(CC) -o $(OUT_DIR)/LM_Beale $(SRC_DIR)/LM_Beale.cpp
+Beale_st24 : $(SRC_DIR)/Beale_st24.cpp
+	$(CC) -o $(OUT_DIR)/Beale_st24 $(SRC_DIR)/Beale_st24.cpp
+Beale_st25 : $(SRC_DIR)/Beale_st25.cpp
+	$(CC) -o $(OUT_DIR)/Beale_st25 $(SRC_DIR)/Beale_st25.cpp
 
-
+newton_problem_7 : $(SRC_DIR)/newton_problem_7.cpp
+	$(CC) -o $(OUT_DIR)/newton_problem_7 $(SRC_DIR)/newton_problem_7.cpp
+gauss_newton_problem_7 : $(SRC_DIR)/gauss_newton_problem_7.cpp
+	$(CC) -o $(OUT_DIR)/gauss_newton_problem_7 $(SRC_DIR)/gauss_newton_problem_7.cpp
+LM_problem_7 : $(SRC_DIR)/LM_problem_7.cpp
+	$(CC) -o $(OUT_DIR)/LM_problem_7 $(SRC_DIR)/LM_problem_7.cpp
 problem_7_st24 : $(SRC_DIR)/problem_7_st24.cpp
 	$(CC) -o $(OUT_DIR)/problem_7_st24 $(SRC_DIR)/problem_7_st24.cpp
 problem_7_st25 : $(SRC_DIR)/problem_7_st25.cpp

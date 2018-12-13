@@ -5,11 +5,11 @@ using namespace std;
 
 int main(int argc, char const *argv[]){
     const int n = 2;
-    const int m = 2;
+    const int m = 3;
 
     var params[n];
-    params[0] = 0.5;
-    params[1] = -2;
+    params[0] = 3;
+    params[1] = 4;
 
     // varをeigenに移す
     VectorXd dx(n);
@@ -32,12 +32,12 @@ int main(int argc, char const *argv[]){
     I = MatrixXd::Identity(n, n);
 
     tau = 1.0;
-    LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
+    LS.Beale_function_vectorizer(funcvec, params);
     J = Jacobi_Xd(m, n, funcvec, params);
     Jt = J.transpose();
     JtJ = Jt * J;
     damp = tau * Max_diagonal(JtJ);
-    answer = 24.4921;
+    answer = 0;
     nu = 2.0;
     beta = 2.0;
     gamma = 3.0;
@@ -49,8 +49,8 @@ int main(int argc, char const *argv[]){
 
     // cout << "\n" << "E          ||g||          damp       E_dash - E         gf" <<endl;
     for(int k=0; k<70; k++){
-        E = LS.Freudenstein_and_Roth_function(params);
-        LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
+        E = LS.Beale_function(params);
+        LS.Beale_function_vectorizer(funcvec, params);
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);
@@ -74,7 +74,7 @@ int main(int argc, char const *argv[]){
         for(int j=0; j<n; j++){
             params[j] = x_dash(j);
         }
-        E_dash = LS.Freudenstein_and_Roth_function(params);
+        E_dash = LS.Beale_function(params);
         for(int j=0; j<n; j++){
             params[j] = x(j);
         }
@@ -87,8 +87,9 @@ int main(int argc, char const *argv[]){
         // cout << abs(answer - val(E)) << endl;
         // cout << gf <<endl;
         // cout << val(E) << "  " << g.norm() << "  " << damp << "  " << val(E_dash) - val(E) << "  " << gf << endl;
-        cout << "[" << x(0) << ", " << x(1) << "]," <<endl;
-        
+        // cout << val(E) << endl;
+        cout << x(1) << endl;
+
         // ダンピングファクタ変更判定
         if (gf > 0){
             damp = damp * ST.max_in_2(beta, gamma, p, gf);

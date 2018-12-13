@@ -5,11 +5,11 @@ using namespace std;
 
 int main(int argc, char const *argv[]){
     const int n = 2;
-    const int m = 3;
+    const int m = 2;
 
     var params[n];
-    params[0] = 3;
-    params[1] = 4;
+    params[0] = 0.5;
+    params[1] = -2;
 
 // varをeigenに移す
     VectorXd dx(n);
@@ -22,29 +22,30 @@ int main(int argc, char const *argv[]){
 
     LeastSquaresFunc LS;
     var E;
+    var funcvec[m];
+    VectorXd e(m);
     VectorXd g(n);
-    MatrixXd H;
-    double dxnorm, answer;
+    MatrixXd J, Jt, JtJ;
+    double dxnorm;
 
     for(int k=0; k<100; k++){
 
-        E = LS.Beale_function(params);
-        // cout << val(E) << endl;
-        cout << x(0) << endl;
+        E = LS.Freudenstein_and_Roth_function(params);
+        LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
+        // cout << E << endl;
+        cout << "[" << x(0) << ", " << x(1) << "]," <<endl;
 
-        g = Gradient_Xd(n, E, params);
-        H = Hesse_Xd(n, E, params);
+        for (int i=0; i<m; i++){
+            e(i) = val(funcvec[i]);
+        }
+
+        J = Jacobi_Xd(m, n, funcvec, params);
+        Jt = J.transpose();
+        JtJ = Jt * J;
+        g = Jt * e;
         
-        dx = H.fullPivLu().solve(-g);
+        dx = JtJ.fullPivLu().solve(-g);
         x = x + dx;
-
-        // 収束判定
-        if ( g.norm() < 1.0e-12 ){
-            break;
-        }
-        if( dx.norm()/x.norm() < 1.0e-12 ){
-            break;
-        }
     
         //params更新
         for(int j=0; j<n; j++){
@@ -57,8 +58,12 @@ int main(int argc, char const *argv[]){
             dxnorm += dx(j)*dx(j);
         } 
         dxnorm = sqrt(dxnorm);
+
+        if ( dxnorm < 1.0e-14){
+            break;
+        }
     }
-    cout << "\nH = \n" << H << endl;
+    cout << "\nJtJ = \n" << JtJ << endl;
     cout << "\nx = \n" << x <<endl;  
     cout << "\n||dx|| = \n" << dxnorm <<endl;
 

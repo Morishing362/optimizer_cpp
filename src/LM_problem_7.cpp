@@ -5,11 +5,11 @@ using namespace std;
 
 int main(int argc, char const *argv[]){
     const int n = 2;
-    const int m = 3;
+    const int m = 2;
 
     var params[n];
-    params[0] = 3;
-    params[1] = 4;
+    params[0] = 0.5;
+    params[1] = -2;
 
     // varをeigenに移す
     VectorXd dx(n);
@@ -31,15 +31,17 @@ int main(int argc, char const *argv[]){
 
     damp = 1;
     I = MatrixXd::Identity(n, n);
-    F = val(LS.Beale_function(params));
+    F = val(LS.Freudenstein_and_Roth_function(params));
 
     cout << "\ndamp_init = \n" << damp << "\n" << endl;
 
     for(int k=0; k<1000; k++){
-        E = LS.Beale_function(params);
-        LS.Beale_function_vectorizer(funcvec, params);
+        E = LS.Freudenstein_and_Roth_function(params);
+        LS.Freudenstein_and_Roth_function_vectorizer(funcvec, params);
         // cout << x(1) << endl;
-        cout << val(E) << endl;
+        // cout << val(E) << endl;
+        cout << "[" << x(0) << ", " << x(1) << "]," <<endl;
+
 
         for (int i=0; i<m; i++){
             e(i) = val(funcvec[i]);
@@ -66,7 +68,7 @@ int main(int argc, char const *argv[]){
         for(int j=0; j<n; j++){
             params[j] = x_dash(j);
         }
-        E_plus_1 = LS.Beale_function(params);
+        E_plus_1 = LS.Freudenstein_and_Roth_function(params);
 
         // ダンピングファクタ変更判定
         if( val(E_plus_1) > F ){
